@@ -1,24 +1,10 @@
-from django.shortcuts import render
-
 from kubernetes.client.rest import ApiException
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from core.kubernetes_driver import create_replicaset, list_pods, list_pods_replicaset, delete_replicaset, list_replicasets
+from core.kubernetes_driver import create_replicaset, delete_replicaset, list_replicasets
 
-# Create your views here.
-class PodView(APIView):
-    
-    def get(self,request, name_replicaset : str = None):
-
-        if name_replicaset:
-            all_pods, count_status = list_pods_replicaset(name_replicaset)
-            return Response({ "status":count_status,"pods":all_pods,},status=200)
-           
-        all_pods, count_status = list_pods()
-        return Response({ "status":count_status,"pods":all_pods,},status=200)
-    
 class ReplicaSetsView(APIView):
 
     def get(self,request):
