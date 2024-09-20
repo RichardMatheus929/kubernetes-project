@@ -20,7 +20,7 @@ class PodView(APIView):
         return Response({ "status":count_status,"pods":all_pods,},status=200)
     
 class ReplicaSetsView(APIView):
-    
+
     def get(self,request):
         all_replicasets = list_replicasets()
         return Response({"replicasets":all_replicasets},status=200)
@@ -44,4 +44,4 @@ class ReplicaSetsView(APIView):
         except ApiException:
             return Response({"reponse":f'Erro ao deletar o replicaset {name_object}, verifique se ele existe'},status=400)
 
-        return Response({"reponse":f'Replicaset deletado'},status=200)
+        return Response({"reponse":f'Replicaset: {name_object} deletado'},status=200)
