@@ -3,7 +3,9 @@ from kubernetes.client.rest import ApiException
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from core.kubernetes_driver import create_replicaset, delete_replicaset, list_replicasets
+import json
+
+from core.kubernetes.replicasets import create_replicaset, delete_replicaset, list_replicasets
 
 class ReplicaSetsView(APIView):
 
@@ -22,11 +24,11 @@ class ReplicaSetsView(APIView):
             return Response({"reponse":f'{request.data['replicas']} replicas atualizadas para o replicaset {name}'},status=400)
     
     def delete(self,request):
-        object = request.data['object']
+
         name_object = request.data['name_object']
 
         try:
-            delete_replicaset(object,name_object)
+            delete_replicaset(name_object)
         except ApiException:
             return Response({"reponse":f'Erro ao deletar o replicaset {name_object}, verifique se ele existe'},status=400)
 
