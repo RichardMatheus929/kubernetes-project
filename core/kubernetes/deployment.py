@@ -1,5 +1,7 @@
 from kubernetes import client, config
 
+import yaml
+
 
 def list_deployments() -> list[dict]:
     all_deployments = []
@@ -27,41 +29,12 @@ def create_deployment(name:str = 'my-replicaset', replicas:int = 1) -> str:
     # Criar uma instância da API para ReplicaSets
     api_instance = client.AppsV1Api()
 
-    manifest = {
-        "apiVersion": "apps/v1",
-        "kind": "Deployment",
-        "metadata": {
-            "name": name
-        },
-        "spec": {
-            "replicas": int(replicas),
-            "selector": {
-                "matchLabels": {
-                    "app": "my-app-django"
-                }
-            },
-            "template": {
-                "metadata": {
-                    "labels": {
-                        "app": "my-app-django"
-                    }
-                },
-                "spec": {
-                    "containers": [
-                        {
-                            "name": "my-app-django",
-                            "image": "richardmatheus929/todolist:latest",
-                            "ports": [
-                                {
-                                    "containerPort": 8000
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        }
-    }
+    with open("core/manifest/deployment.yaml", 'r') as file:
+        manifest = yaml.safe_load(file)
+
+    manifest['metadata']['name'] = name
+    manifest['spec']['replicas'] = int(replicas)
+
     # Criar o ReplicaSet no namespace default
     namespace = "default"
     try:

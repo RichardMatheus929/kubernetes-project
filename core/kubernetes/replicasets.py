@@ -31,41 +31,11 @@ def create_replicaset(replicas: int = 1, name: str = 'my-replicaset') -> str:
     # Criar uma instância da API para ReplicaSets
     api_instance = client.AppsV1Api()
 
-    manifest = {
-        "apiVersion": "apps/v1",
-        "kind": "ReplicaSet",
-        "metadata": {
-            "name": name
-        },
-        "spec": {
-            "replicas": int(replicas),
-            "selector": {
-                "matchLabels": {
-                    "app": "my-app-django"
-                }
-            },
-            "template": {
-                "metadata": {
-                    "labels": {
-                        "app": "my-app-django"
-                    }
-                },
-                "spec": {
-                    "containers": [
-                        {
-                            "name": "my-app-django",
-                            "image": "richardmatheus929/todolist:latest",
-                            "ports": [
-                                {
-                                    "containerPort": 8000
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        }
-    }
+    with open("core/manifest/replicas.yaml", 'r') as file:
+        manifest = yaml.safe_load(file)
+
+    manifest['metadata']['name'] = name
+    manifest['spec']['replicas'] = int(replicas)
 
     # Criar o ReplicaSet no namespace default
     namespace = "default"
