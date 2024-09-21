@@ -20,7 +20,7 @@ class DeploymentView(APIView):
         if create_deployment(replicas=replicas, name=name) == 'create':
             return Response({"reponse":f'{request.data['replicas']} replicas para o {name} criados'},status=200)
         else: 
-            return Response({"reponse":f'{request.data['replicas']} replicas atualizadas para o replicaset {name}'},status=400)
+            return Response({"reponse":f'{request.data['replicas']} replicas atualizadas para o deployment {name}'},status=400)
         
     def delete(self, request):
         name_object = request.data['name_object']
@@ -28,6 +28,6 @@ class DeploymentView(APIView):
         try:
             delete_deployment(name_object)
         except ApiException:
-            return Response({"reponse":f'Erro ao deletar o replicaset {name_object}, verifique se ele existe'},status=400)
+            return Response({"reponse":f'Erro ao deletar o deployment {name_object}, verifique se ele existe'},status=400)
 
-        return Response({"reponse":f'Replicaset: {name_object} deletado'},status=200)
+        return Response({"reponse":f'deployment: "{name_object}" deletado'},status=200)
