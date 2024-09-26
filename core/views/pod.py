@@ -8,7 +8,7 @@ from core.kubernetes.pods import  list_pods, list_pods_replicaset
 # Create your views here.
 class PodView(APIView):
     
-    def get(self,request, name_replicaset : str = None):
+    def get(self,request, name_replicaset : str = ""):
 
         if name_replicaset:
             try:
