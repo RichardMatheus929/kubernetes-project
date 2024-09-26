@@ -3,13 +3,16 @@ from kubernetes import config, client
 import yaml
 from collections import Counter
 
+config.load_kube_config()
+v1 = client.AppsV1Api()
+
+# Criar uma instância da API para ReplicaSets
+api_instance = client.AppsV1Api()
 
 def list_replicasets():
+
     all_replicasets = []
 
-    config.load_kube_config()
-
-    v1 = client.AppsV1Api()
     replicasets = v1.list_replica_set_for_all_namespaces(watch=False).items
 
     for replicaset in replicasets:
@@ -25,13 +28,8 @@ def list_replicasets():
 
 
 def create_replicaset(replicas: int = 1, name: str = 'my-replicaset') -> str:
-    # Carregar a configuração do Kubernetes
-    config.load_kube_config()
 
-    # Criar uma instância da API para ReplicaSets
-    api_instance = client.AppsV1Api()
-
-    with open("core/manifest/replicas.yaml", 'r') as file:
+    with open("core/manifest/replicaset.yaml", 'r') as file:
         manifest = yaml.safe_load(file)
 
     manifest['metadata']['name'] = name
@@ -50,12 +48,6 @@ def create_replicaset(replicas: int = 1, name: str = 'my-replicaset') -> str:
 
 
 def delete_replicaset(name_object: str, namespace: str = "default"):
-
-    # Carregar a configuração do Kubernetes
-    config.load_kube_config()
-
-    # Criar uma instância da API para ReplicaSets
-    api_instance = client.AppsV1Api()
 
     api_instance.delete_namespaced_replica_set(
         name=name_object, namespace=namespace)
