@@ -20,7 +20,7 @@ class DeploymentView(APIView):
         if create_deployment(replicas=replicas, name=name) == 'create':
             return Response({"reponse":f'{request.data['replicas']} replicas para o {name} criados'},status=200)
         else: 
-            return Response({"reponse":f'{request.data['replicas']} replicas atualizadas para o deployment {name}'},status=400)
+            return Response({"reponse":f'{request.data['replicas']} replicas atualizadas para o deployment {name}'},status=201)
         
     def delete(self, request):
         name_object = request.data['name_object']
