@@ -1,21 +1,45 @@
-from pprint import pprint
-import requests
+from prometheus_api_client import PrometheusConnect
+import pandas as pd
 
-# Chamando o endpoitn de metricas do prometheus para pesquisa a partir de uma query
-url = "http://localhost:9090/api/v1/query"
-prometheus_query = '100 * (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)'
-# prometheus_query = 'sum by (namespace) (kube_pod_info)'
-params = {"query":prometheus_query}
+from time import sleep
 
-response = requests.get(url, params=params)
-all_metrics = response.json()['data']['result']
+# Conectar ao Prometheus (substitua pela URL correta se necessário)
+prom = PrometheusConnect(url="http://localhost:9090", disable_ssl=True)
 
-# print('Métricas totais')
-# pprint(all_metrics)
+# Consulta PromQL para obter o uso de CPU de cada pod no namespace "default" em milicores
+cpu_usage_query = 'sum(rate(container_cpu_usage_seconds_total{namespace="default"}[5m])) by (pod) * 1000'
 
-for metric in all_metrics:
-    # print(f"Node: {metric['metric']['instance']} RAM-USAGE {float(metric['value'][1]):.2f}%")
-    pprint(metric)
 
-# import pdb; pdb.set_trace()
+while True:
+    # Executar a consulta
+    cpu_usage = prom.custom_query(cpu_usage_query)
 
+    # Listas para armazenar os dados
+    pod_names = []
+    cpu_values = []
+    cpu_percentages = []
+
+    # Processar os resultados
+    for item in cpu_usage:
+        pod_name = item['metric']['pod']
+        cpu_value_milicores = float(item['value'][1])  # O valor em milicores
+        cpu_percentage = (cpu_value_milicores / 1000) * 100  # Calcular a porcentagem
+        
+        # Adicionar os dados às listas
+        pod_names.append(pod_name)
+        cpu_values.append(cpu_value_milicores)
+        cpu_percentages.append(cpu_percentage)
+
+    # Criar um DataFrame do pandas
+    df = pd.DataFrame({
+        'Pod Name': pod_names,
+        'CPU Usage (milicores)': cpu_values,
+        'CPU Usage (%)': cpu_percentages
+    })
+
+    # Exibir os dados em formato tabular
+    print("\nUso de CPU de cada pod:")
+    print(df)
+
+    # Aguardar 5 segundos antes de executar a próxima iteração
+    sleep(3)
